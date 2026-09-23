@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#FBF6F7">
+<title>DREAM COME TRUE 夥伴狀態</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Cormorant+Garamond:ital,wght@1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF6F7; --paper:#FFFFFF; --ink:#2A2326; --ink2:#6E6367; --ink3:#A89CA0;
+  --line:#EEE4E7; --rose:#E7A3B6; --rose-d:#C9728C; --rose-l:#FCEEF2; --blush:#F6E3E8;
+  --r-lg:22px; --r-md:14px; --r-sm:10px;
+  --red:#E25D6A; --yellow:#E8B84A; --green:#6BAE7F; --off:#3A3336; --white:#D9D3D5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Noto Sans TC',-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;
+  background:var(--bg);color:var(--ink);letter-spacing:.02em;line-height:1.6;
+  padding:env(safe-area-inset-top,0) 0 calc(96px + env(safe-area-inset-bottom,0));
+  -webkit-tap-highlight-color:transparent;
+}
+body.lock{overflow:hidden}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+
+/* top bar */
+.topbar{position:-webkit-sticky;position:sticky;top:0;z-index:50;background:rgba(251,246,247,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .2s}
+.topbar.scrolled{border-bottom-color:var(--line)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.35rem;font-weight:600;color:var(--rose-d);letter-spacing:.01em}
+.top-actions{display:flex;gap:6px;position:relative}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:1.1rem;background:var(--paper);border:1px solid var(--line)}
+.icon-btn:active{transform:scale(.94)}
+.menu{position:absolute;right:0;top:48px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:6px;min-width:170px;box-shadow:0 12px 30px rgba(120,70,90,.12);display:none}
+.menu.open{display:block}
+.menu button{display:block;width:100%;text-align:left;padding:11px 14px;border-radius:var(--r-sm);font-size:.95rem;font-weight:500}
+.menu button:hover{background:var(--rose-l)}
+
+/* hero */
+.hero{padding:22px 0 18px}
+.hero-date{font-size:.9rem;color:var(--ink2);font-weight:500}
+.hero h1{font-size:clamp(1.7rem,6vw,2.4rem);font-weight:900;line-height:1.3;letter-spacing:-.01em;margin-top:4px}
+.hero h1 .n{display:inline-block;min-width:1.2em;padding:0 .25em;margin:0 .1em;background:var(--rose);color:#fff;border-radius:12px;text-align:center}
+.hero p{color:var(--ink2);margin-top:6px;font-size:.95rem}
+
+/* reminders */
+.remind{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+.remind-item{display:flex;align-items:center;gap:12px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:10px 12px}
+.remind-item .txt{flex:1;font-size:.95rem;min-width:0}
+.remind-item .txt small{display:block;color:var(--ink3);font-size:.8rem}
+.remind-item.bday{background:var(--rose-l);border-color:var(--blush)}
+.chk{flex:none;height:36px;padding:0 14px;border-radius:18px;background:var(--ink);color:#fff;font-weight:700;font-size:.85rem}
+.chk.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line)}
+
+/* tabs */
+.tabs{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:21px;background:var(--paper);border:1px solid var(--line);font-weight:700;font-size:.95rem;color:var(--ink2);white-space:nowrap}
+.tab b{font-size:.85rem;min-width:24px;height:24px;line-height:24px;padding:0 7px;border-radius:12px;background:var(--bg);color:var(--ink)}
+.tab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.tab.on b{background:var(--rose);color:#fff}
+
+/* filters */
+.filters{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:20px}
+.filter-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.field{width:100%;height:46px;padding:0 14px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--paper);font-size:16px;color:var(--ink);outline:none;-webkit-appearance:none;appearance:none}
+select.field{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23A89CA0' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:28px}
+.field:focus{border-color:var(--rose)}
+textarea.field{height:auto;padding:12px 14px;resize:vertical;line-height:1.7}
+.search{padding-left:42px;background:var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23A89CA0' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") no-repeat 14px center}
+@media(min-width:760px){.filters{grid-template-columns:2fr 3fr}}
+
+/* grid & card */
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.grid>.card{min-width:0}
+@media(min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
+@media(min-width:960px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.c-sub{font-size:.8rem;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-profit{text-align:right;flex:none}
+.c-profit b{display:block;font-size:1.1rem;font-weight:900;line-height:1.2;letter-spacing:0}
+.c-profit small{font-size:.72rem;color:var(--ink3)}
+.c-profit small.up,.c-profit small.down{font-weight:700}
+.care-line{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:12px;padding:8px 10px;font-size:.85rem}
+.care-line.late{background:#FFF1F2}
+.care-line .when{flex:none;font-weight:700}
+.care-line.late .when{color:var(--red)}
+.care-line .sn{flex:1;min-width:0;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.flash{animation:flash 1.2s}
+@keyframes flash{0%,100%{box-shadow:0 0 0 0 rgba(231,163,182,0)}30%{box-shadow:0 0 0 4px rgba(231,163,182,.6)}}
+.c-head{display:flex;gap:12px;align-items:center}
+.avatar{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:1.25rem;position:relative}
+.avatar .dot{position:absolute;right:0;bottom:1px;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff}
+.c-name{flex:1;min-width:0}
+.c-name .nm{font-size:1.1rem;font-weight:900;line-height:1.3}
+.c-name .ln{font-size:.85rem;color:var(--ink3);margin-left:4px;font-weight:500}
+.pills{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
+.pill{font-size:.78rem;font-weight:700;padding:2px 10px;border-radius:12px;line-height:1.6}
+.st{background:var(--bg);color:var(--ink2)}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.meta span,.meta a{font-size:.85rem;color:var(--ink2);background:var(--bg);padding:4px 10px;border-radius:8px;text-decoration:none}
+.meta a{color:var(--rose-d);font-weight:700}
+.profit{display:flex;align-items:baseline;justify-content:space-between;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);padding:10px 2px}
+.profit .lb{font-size:.85rem;color:var(--ink2)}
+.profit .v{font-size:1.4rem;font-weight:900;letter-spacing:0}
+.profit .v small{font-size:.8rem;font-weight:700;margin-left:6px}
+.up{color:#3E8E5E}.down{color:var(--red)}
+.care{background:var(--bg);border-radius:var(--r-md);padding:12px 14px;font-size:.9rem}
+.care.late{background:#FFF1F2}
+.care-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700}
+.care-top .days{font-size:.82rem;color:var(--ink2);font-weight:700}
+.care.late .days{color:var(--red)}
+.care p{color:var(--ink2);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.88rem}
+.mini-chk{height:30px;padding:0 12px;border-radius:15px;background:var(--ink);color:#fff;font-size:.8rem;font-weight:700;flex:none}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:.8rem;color:var(--rose-d);font-weight:700}
+.c-foot{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:auto}
+.c-foot button{font-size:.84rem}
+.c-foot button{height:36px;border-radius:var(--r-sm);background:var(--bg);font-size:.88rem;font-weight:700;color:var(--ink)}
+.c-foot button:active{background:var(--blush)}
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ink3)}
+.empty b{display:block;color:var(--ink);font-size:1.1rem;margin-bottom:4px}
+
+/* level colors */
+.lv-皇家{background:#EFE9F7;color:#7B5EA7}
+.lv-一級{background:#FBE8EE;color:#C2577A}
+.lv-二級{background:#E7EFF8;color:#4F7CAC}
+.lv-三級輔導{background:#E6F2EA;color:#4E8563}
+.lv-三級零售{background:#FBEEE3;color:#B96E38}
+.lv-實習{background:#EFEBEC;color:#7A7275}
+
+/* FAB */
+.fab{position:fixed;right:20px;bottom:calc(22px + env(safe-area-inset-bottom,0));z-index:60;height:56px;padding:0 22px 0 18px;border-radius:28px;background:var(--ink);color:#fff;font-weight:700;font-size:1rem;display:flex;align-items:center;gap:8px;box-shadow:0 10px 24px rgba(42,35,38,.25)}
+.fab span{font-size:1.5rem;line-height:1;font-weight:400}
+.fab:active{transform:scale(.96)}
+
+/* sheet modal */
+.modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(42,35,38,.4);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center}
+.modal.open{display:flex}
+.sheet{background:var(--paper);width:100%;max-width:720px;max-height:92vh;max-height:92dvh;border-radius:26px 26px 0 0;display:flex;flex-direction:column;animation:up .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media(min-width:760px){.modal{align-items:center;padding:20px}.sheet{border-radius:26px;max-height:88vh}}
+@media(prefers-reduced-motion:reduce){.sheet{animation:none}}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+.sheet-head h2{font-size:1.2rem;font-weight:900}
+.close{width:36px;height:36px;border-radius:50%;background:var(--bg);font-size:1rem}
+.sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 20px calc(20px + env(safe-area-inset-bottom,0))}
+.sheet-foot{display:flex;gap:8px;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0));border-top:1px solid var(--line)}
+.btn{height:48px;padding:0 20px;border-radius:var(--r-md);font-weight:700;font-size:1rem;background:var(--ink);color:#fff}
+.btn.ghost{background:var(--bg);color:var(--ink)}
+.btn.danger{background:transparent;color:var(--red);padding:0 10px}
+.btn.sm{height:38px;font-size:.88rem;padding:0 14px}
+.grow{flex:1}
+
+.sec{margin-bottom:22px}
+.sec-t{font-size:1rem;font-weight:900;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sec-t::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--rose)}
+.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px}
+.fg label{display:block;font-size:.85rem;font-weight:700;color:var(--ink2);margin-bottom:4px}
+.fg label i{font-style:normal;color:var(--rose-d)}
+input[type=date].field{line-height:46px}
+.upload{display:inline-flex;align-items:center;gap:6px;margin-top:8px;height:36px;padding:0 14px;border-radius:18px;border:1px dashed var(--rose);color:var(--rose-d);font-size:.85rem;font-weight:700;cursor:pointer}
+.fg label.upload{display:inline-flex;margin-bottom:0}
+.upload input{display:none}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.thumb{position:relative}
+.thumb img{width:72px;height:72px;object-fit:cover;border-radius:12px;display:block;cursor:pointer}
+.thumb .x{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font-size:.7rem;display:grid;place-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--rose-l);color:var(--rose-d);font-weight:700;font-size:.85rem;padding:4px 6px 4px 12px;border-radius:14px;display:inline-flex;align-items:center;gap:6px}
+.chip button{width:20px;height:20px;border-radius:50%;background:#fff;font-size:.7rem}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:var(--r-md);padding:4px;gap:4px}
+.seg button{height:38px;border-radius:10px;font-weight:700;color:var(--ink2)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.block{border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;margin-bottom:14px}
+.block h3{font-size:.95rem;font-weight:900;margin-bottom:10px}
+.block .fg{margin-bottom:10px}
+.block .fg:last-child{margin-bottom:0}
+
+/* profile / timeline */
+.pf-top{display:flex;gap:14px;align-items:center;margin-bottom:16px}
+.pf-top .avatar{width:64px;height:64px;font-size:1.6rem}
+.kv{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:18px}
+.kv div{background:var(--bg);border-radius:var(--r-md);padding:10px 12px}
+.kv small{display:block;color:var(--ink3);font-size:.78rem;font-weight:700}
+.kv span{font-weight:700;font-size:.95rem;word-break:break-all}
+.story{border-left:3px solid var(--blush);padding:4px 0 4px 14px;margin-bottom:14px}
+.story b{display:block;font-size:.9rem;color:var(--rose-d)}
+.story p{white-space:pre-wrap;font-size:.95rem}
+.tl{position:relative;padding-left:18px}
+.tl::before{content:"";position:absolute;left:4px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.tl-item{position:relative;margin-bottom:18px}
+.tl-item::before{content:"";position:absolute;left:-18px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--rose);border:2px solid #fff;box-shadow:0 0 0 1px var(--rose)}
+.tl-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.tl-head b{font-size:.95rem}
+.tl-head small{color:var(--ink3);margin-left:6px}
+.tl-entry{background:var(--bg);border-radius:var(--r-sm);padding:8px 12px;margin-bottom:6px;font-size:.92rem}
+.tl-entry em{font-style:normal;font-weight:700;color:var(--rose-d);font-size:.8rem;display:block}
+.tl-entry p{white-space:pre-wrap}
+.bars{display:flex;align-items:flex-end;gap:10px;height:130px;padding-top:18px;overflow-x:auto}
+.bar{flex:1;min-width:44px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.bar i{display:block;width:100%;max-width:38px;background:var(--rose);border-radius:8px 8px 3px 3px;position:relative}
+.bar i span{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:.7rem;font-weight:700;white-space:nowrap;font-style:normal}
+.bar small{font-size:.75rem;color:var(--ink3);margin-top:4px}
+.muted{color:var(--ink3);font-size:.9rem}
+
+.viewer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:3000;align-items:center;justify-content:center;padding:20px}
+.viewer.open{display:flex}
+.viewer img{max-width:100%;max-height:90vh;border-radius:14px}
+.toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top,0));transform:translate(-50%,-80px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:24px;font-weight:700;z-index:5000;transition:transform .3s cubic-bezier(.2,.8,.2,1);max-width:90vw;text-align:center}
+.toast.show{transform:translate(-50%,0)}
+:focus-visible{outline:2px solid var(--rose-d);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="wrap">
+    <div class="logo">Dream Come True</div>
+    <div class="top-actions">
+      <button class="icon-btn" onclick="requestNotificationPermission()" aria-label="開啟通知">🔔</button>
+      <button class="icon-btn" onclick="toggleMenu(event)" aria-label="更多">⋯</button>
+      <div class="menu" id="menu">
+        <button onclick="exportData()">⬇︎ 匯出備份</button>
+        <button onclick="triggerImport()">⬆︎ 匯入備份</button>
+      </div>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importData(event)">
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-date" id="heroDate"></div>
+    <h1 id="heroTitle"></h1>
+    <p>把每一次聯繫與成長，都變成有跡可循的累積。</p>
+  </section>
+
+  <div class="remind" id="reminderList"></div>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab on" data-mode="ALL" onclick="setDashboardFilter('ALL')">全部夥伴 <b id="cAll">0</b></button>
+    <button class="tab" data-mode="TRACK" onclick="setDashboardFilter('TRACK')">該關心了 <b id="cTrack">0</b></button>
+    <button class="tab" data-mode="PRIORITY" onclick="setDashboardFilter('PRIORITY')">重點跟進 <b id="cPriority">0</b></button>
+    <button class="tab" data-mode="ACTIVE" onclick="setDashboardFilter('ACTIVE')">已啟動經營 <b id="cActive">0</b></button>
+  </nav>
+
+  <div class="filters">
+    <input type="text" class="field search" id="searchInput" placeholder="搜尋姓名、LINE、居住地、標籤" oninput="renderMembers()">
+    <div class="filter-row">
+      <select class="field" id="levelFilter" onchange="renderMembers()">
+        <option value="ALL">全部級別</option>
+        <option>皇家</option><option>一級</option><option>二級</option><option>三級輔導</option><option>三級零售</option><option>實習</option>
+      </select>
+      <select class="field" id="statusFilter" onchange="renderMembers()"></select>
+      <input type="text" inputmode="numeric" class="field" id="birthdayFilter" placeholder="生日 0917" oninput="renderMembers()">
+    </div>
+  </div>
+
+  <div class="grid" id="memberGrid"></div>
+</main>
+
+<button class="fab" onclick="openNewMember()"><span>＋</span>新增夥伴</button>
+
+<!-- 夥伴檔案 -->
+<div class="modal" id="memberModal" onclick="bgClose(event,'memberModal')">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="modalTitle">新增夥伴</h2><button class="close" onclick="closeModal('memberModal')">✕</button></div>
+    <form id="memberForm" onsubmit="saveMember(event)" style="display:contents">
+    <div class="sheet-body">
+      <input type="hidden" id="memberId">
+      <div class="sec">
+        <div class="sec-t">基本資料</div>
+        <div class="frow">
+          <div class="fg"><label>姓名 <i>*</i></label><input class="field" id="memberName" required placeholder="雅筑"></div>
+          <div class="fg"><label>LINE 名稱 <i>*</i></label><input class="field" id="memberLineName" required placeholder="Ya-Chu"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>生日</label><input type="date" class="field" id="memberBirthday"></div>
+          <div class="fg"><label>居住地</label><input class="field" id="memberCity" placeholder="台南市"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>職業</label><input class="field" id="memberJob" placeholder="護理師／全職媽媽"></div>
+          <div class="fg"><label>IG 連結</label><input type="url" class="field" id="memberIg" placeholder="https://instagram.com/…"></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t">級別與狀態</div>
+        <div class="frow">
+          <div class="fg"><label>目前級別 <i>*</i></label>
+            <select class="field" id="memberLevel" required onchange="onLevelChange()">
+              <option>實習</option><option>三級零售</option><option>三級輔導</option><option>二級</option><option>一級</option><option>皇家</option>
+            </select></div>
+          <div class="fg"><label>晉升日期</label><input type="date" class="field" id="memberPromoteDate"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>狀態燈號 <i>*</i></label><select class="field" id="memberStatus" required></select></div>
+          <div class="fg"><label>加入日期</label><input type="date" class="field" id="memberJoinDate"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>最後關心日</label><input type="date" class="field" id="memberLastCareDate"></div>
+          <div class="fg"><label>起始粉絲數</label><input type="number" inputmode="numeric" class="field" id="memberInitialFollowers" placeholder="1200"></div>
+        </div>
+        <div class="fg"><label>特質標籤（用逗號分隔）</label><input class="field" id="memberTags" placeholder="ENTJ, 兼職, 美妝"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t">每月淨利</div>
+        <div class="frow" style="grid-template-columns:1fr 1fr auto;align-items:end">
+          <div class="fg"><label>月份</label><select class="field" id="profitMonth"></select></div>
+          <div class="fg"><label>淨利（元）</label><input type="number" inputmode="numeric" class="field" id="profitAmount" placeholder="150000"></div>
+          <button type="button" class="btn" style="height:46px" onclick="addProfitRecord()">加入</button>
+        </div>
+        <div class="chips" id="profitRecordList"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-t">產品見證</div>
+        <div class="fg" style="margin-bottom:14px"><label>🏃 瘦身經歷</label><textarea class="field" id="storySlim" rows="2"></textarea>
+          <label class="upload">＋ 照片<input type="file" accept="image/*" multiple onchange="handlePhotoUpload(event,'slim')"></label><div class="thumbs" id="thumb-slim"></div></div>
+        <div class="fg" style="margin-bottom:14px"><label>✨ 美肌故事</label><textarea class="field" id="storySkin" rows="2"></textarea>
+          <label class="upload">＋ 照片<input type="file" accept="image/*" multiple onchange="handlePhotoUpload(event,'skin')"></label><div class="thumbs" id="thumb-skin"></div></div>
+        <div class="fg" style="margin-bottom:14px"><label>🌿 健康系列</label><textarea class="field" id="storyHealth" rows="2"></textarea></div>
+        <div class="fg"><label>🏆 9S 見證</label><textarea class="field" id="story9S" rows="2"></textarea>
+          <label class="upload">＋ 照片<input type="file" accept="image/*" multiple onchange="handlePhotoUpload(event,'s9')"></label><div class="thumbs" id="thumb-s9"></div></div>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button type="button" class="btn danger" id="deleteMemberBtn" onclick="deleteMember()">刪除</button>
+      <div class="grow"></div>
+      <button type="button" class="btn ghost" onclick="closeModal('memberModal')">取消</button>
+      <button type="submit" class="btn">儲存</button>
+    </div>
+    </form>
+  </div>
+</div>
+
+<!-- 預覽 -->
+<div class="modal" id="viewModal" onclick="bgClose(event,'viewModal')">
+  <div class="sheet">
+    <div class="sheet-head"><h2>夥伴檔案</h2><button class="close" onclick="closeModal('viewModal')">✕</button></div>
+    <div class="sheet-body" id="viewModalContent"></div>
+    <div class="sheet-foot"><div class="grow"></div><button class="btn" id="viewToEditBtn">編輯檔案</button></div>
+  </div>
+</div>
+
+<!-- 日記 -->
+<div class="modal" id="diaryModal" onclick="bgClose(event,'diaryModal')">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="diaryModalTitle">培訓日記</h2><button class="close" onclick="closeModal('diaryModal')">✕</button></div>
+    <div class="sheet-body">
+      <form id="diaryForm" onsubmit="saveDiaryEntry(event)">
+        <input type="hidden" id="diaryMemberId"><input type="hidden" id="diaryEntryId"><input type="hidden" id="diaryType" value="🌐 線上">
+        <div class="frow" style="grid-template-columns:1fr 1fr;align-items:end">
+          <div class="fg"><label>日期</label><input type="date" class="field" id="diaryDate" required></div>
+          <div class="fg"><label>形式</label>
+            <div class="seg" id="diaryTypeSeg">
+              <button type="button" data-v="🌐 線上" class="on" onclick="setDiaryType(this.dataset.v)">🌐 線上</button>
+              <button type="button" data-v="🤝 線下" onclick="setDiaryType(this.dataset.v)">🤝 線下</button>
+            </div></div>
+        </div>
+        <div class="block">
+          <h3>🔄 零售四大循環</h3>
+          <div class="fg"><label>引流</label><textarea class="field" id="diary_retail_drain" rows="2" placeholder="短影音、貼文帶來多少詢問"></textarea></div>
+          <div class="fg"><label>限動</label><textarea class="field" id="diary_retail_story" rows="2" placeholder="發了什麼限動、互動狀況"></textarea></div>
+          <div class="fg"><label>銷售</label><textarea class="field" id="diary_retail_sale" rows="2" placeholder="成交什麼產品、卡在哪裡"></textarea></div>
+          <div class="fg"><label>售後</label><textarea class="field" id="diary_retail_after" rows="2" placeholder="顧客使用回饋、回購狀況"></textarea></div>
+        </div>
+        <div class="block">
+          <h3>🚀 招商與團隊</h3>
+          <div class="fg"><label>招商輔導</label><textarea class="field" id="diary_team_recruit" rows="2" placeholder="一對一諮詢、問題拆解、進度"></textarea></div>
+          <div class="fg"><label>團隊管理</label><textarea class="field" id="diary_team_manage" rows="2" placeholder="培訓、晉升佈局、團隊溝通"></textarea></div>
+        </div>
+        <label class="upload">＋ 截圖／照片<input type="file" accept="image/*" multiple onchange="handlePhotoUpload(event,'diary')"></label>
+        <div class="thumbs" id="thumb-diary"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin:16px 0 26px">
+          <button type="button" class="btn ghost sm" id="cancelDiaryEditBtn" style="display:none" onclick="resetDiaryForm()">取消編輯</button>
+          <button type="submit" class="btn sm" id="saveDiaryBtn">儲存日記</button>
+        </div>
+      </form>
+      <div class="sec-t">過去紀錄</div>
+      <div id="diaryList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 全景圖 -->
+<div class="modal" id="mindmapModal" onclick="bgClose(event,'mindmapModal')">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="mindmapTitle">全景圖</h2><button class="close" onclick="closeModal('mindmapModal')">✕</button></div>
+    <div class="sheet-body" id="mindmapContent"></div>
+  </div>
+</div>
+
+<div class="viewer" id="imgViewerModal" onclick="this.classList.remove('open')"><img id="imgViewerPic" alt="放大照片"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const STORE_KEY='dct_crm_members';
+const STATUS=[
+  {v:'🔴 紅燈活躍',days:3,c:'var(--red)'},
+  {v:'🟡 黃燈關注',days:7,c:'var(--yellow)'},
+  {v:'🟢 綠燈停滯',days:30,c:'var(--green)'},
+  {v:'⚫ 熄燈消失',days:60,c:'var(--off)'},
+  {v:'⚪ 白色自用',days:30,c:'var(--white)'}
+];
+const statusOf=v=>STATUS.find(s=>s.v===v)||{v,days:7,c:'var(--white)'};
+const levelRank={'皇家':6,'一級':5,'二級':4,'三級輔導':3,'三級零售':2,'實習':1};
+const ENTRY_KEYS=['retail_drain','retail_story','retail_sale','retail_after','team_recruit','team_manage'];
+const entryLabelMap={retail_drain:'零售・引流',retail_story:'零售・限動',retail_sale:'零售・銷售',retail_after:'零售・售後',team_recruit:'招商輔導',team_manage:'團隊管理'};
+
+let members=[];
+try{members=JSON.parse(localStorage.getItem(STORE_KEY))||[]}catch(e){members=[]}
+let currentFilterMode='ALL';
+let tempPhotos={slim:[],skin:[],s9:[],diary:[]};
+let tempProfitList=[];
+
+/* ---------- 日期（以本地時間計算，避免 iOS/時區差一天） ---------- */
+const pad=n=>String(n).padStart(2,'0');
+function todayStr(){const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function parseDate(s){if(!s)return null;const p=s.split('-').map(Number);return new Date(p[0],(p[1]||1)-1,p[2]||1)}
+function getDaysDiff(s){const d=parseDate(s);if(!d)return 999;const t=parseDate(todayStr());return Math.max(0,Math.round((t-d)/864e5))}
+function shortDate(s){const d=parseDate(s);return d?`${d.getMonth()+1}/${d.getDate()}`:''}
+function lastCare(m){return m.lastCareDate||(m.diaries&&m.diaries[0]?m.diaries[0].date:m.joinDate)||''}
+function isOverdue(m){return getDaysDiff(lastCare(m))>=statusOf(m.status).days}
+function calculateAgeInfo(b){
+  const d=parseDate(b);if(!d)return{age:'',astro:''};
+  const t=new Date();let age=t.getFullYear()-d.getFullYear();
+  const mm=t.getMonth()-d.getMonth();if(mm<0||(mm===0&&t.getDate()<d.getDate()))age--;
+  const day=d.getDate(),mon=d.getMonth()+1;
+  const a=['摩羯','水瓶','雙魚','牡羊','金牛','雙子','巨蟹','獅子','處女','天秤','天蠍','射手','摩羯'];
+  const last=[19,18,20,19,20,21,22,22,22,23,22,21];
+  return{age:`${age}歲`,astro:`${day>last[mon-1]?a[mon]:a[mon-1]}座`};
+}
+function escapeHtml(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'):''}
+const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+
+/* ---------- 範例資料 ---------- */
+if(members.length===0){
+  members=[{id:'1',name:'雅筑',lineName:'Ya-Chu',birthday:'1995-09-17',city:'台南市',ig:'https://instagram.com',level:'皇家',promoteDate:'2026-01-01',status:'🔴 紅燈活躍',job:'專職美業經營者',joinDate:'2025-05-10',lastCareDate:'2026-09-14',initialFollowers:1500,tags:['ENTJ','招商強手','培訓隊長'],
+    profits:[{month:'2026-07',amount:98000},{month:'2026-08',amount:120000},{month:'2026-09',amount:168000}],
+    stories:{slim:'3個月健康減重6公斤',skin:'水光繃帶面膜，肌膚亮白',health:'',s9:'協助5位夥伴完成9S經營認證'},
+    photos:{slim:[],skin:[],s9:[]},
+    diaries:[{id:'d1',date:'2026-09-14',type:'🌐 線上',entries:{retail_story:'發新品開箱限動，12位詢問、成交3組水光繃帶。',team_recruit:'練習一對一招商問答拆解，本期目標新增3位一級。'},photos:[]}]}];
+  saveToStorage();
+}
+
+function saveToStorage(){
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(members));return true}
+  catch(e){toast('儲存空間滿了，請先匯出備份，再刪掉部分照片');return false}
+}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2600)}
+
+/* ---------- 初始化選單 ---------- */
+(function(){
+  const opts=STATUS.map(s=>`<option value="${s.v}">${s.v}（${s.days}天）</option>`).join('');
+  document.getElementById('statusFilter').innerHTML='<option value="ALL">全部燈號</option>'+opts;
+  document.getElementById('memberStatus').innerHTML=opts;
+  const d=new Date(),w='日一二三四五六';
+  document.getElementById('heroDate').textContent=`${d.getMonth()+1}月${d.getDate()}日 星期${w[d.getDay()]}`;
+  window.addEventListener('scroll',()=>document.getElementById('topbar').classList.toggle('scrolled',window.scrollY>4),{passive:true});
+  document.addEventListener('click',e=>{if(!e.target.closest('.top-actions'))document.getElementById('menu').classList.remove('open')});
+})();
+function fillMonthSelect(){
+  const sel=document.getElementById('profitMonth'),d=new Date();let o='';
+  for(let i=-1;i<36;i++){const x=new Date(d.getFullYear(),d.getMonth()-i,1);const v=`${x.getFullYear()}-${pad(x.getMonth()+1)}`;
+    o+=`<option value="${v}">${x.getFullYear()}年${x.getMonth()+1}月</option>`}
+  sel.innerHTML=o;sel.value=todayStr().slice(0,7);
+}
+fillMonthSelect();
+function toggleMenu(e){e.stopPropagation();document.getElementById('menu').classList.toggle('open')}
+
+/* ---------- 儀表 ---------- */
+function setDashboardFilter(mode){
+  currentFilterMode=mode;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.mode===mode));
+  renderMembers();
+}
+function updateDashboardStats(){
+  const pri=m=>/紅燈|黃燈/.test(m.status), act=m=>/紅燈|黃燈|綠燈/.test(m.status);
+  const track=members.filter(isOverdue).length;
+  document.getElementById('cAll').textContent=members.length;
+  document.getElementById('cPriority').textContent=members.filter(pri).length;
+  document.getElementById('cActive').textContent=members.filter(act).length;
+  document.getElementById('cTrack').textContent=track;
+  document.getElementById('heroTitle').innerHTML=track>0
+    ?`今天有<span class="n">${track}</span>位夥伴<br>等你關心`
+    :`今天的關心<br>都完成了 🌷`;
+}
+
+/* ---------- 卡片 ---------- */
+function renderMembers(){
+  updateDashboardStats();
+  const grid=document.getElementById('memberGrid');
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  const lv=document.getElementById('levelFilter').value;
+  const st=document.getElementById('statusFilter').value;
+  const bf=document.getElementById('birthdayFilter').value.trim();
+  members.sort((a,b)=>(levelRank[b.level]||0)-(levelRank[a.level]||0));
+
+  const list=members.filter(m=>{
+    const hay=[m.name,m.lineName,m.city,...(m.tags||[])].join(' ').toLowerCase();
+    if(q&&!hay.includes(q))return false;
+    if(lv!=='ALL'&&m.level!==lv)return false;
+    if(st!=='ALL'&&m.status!==st)return false;
+    if(bf){if(!m.birthday)return false;if(!m.birthday.replace(/-/g,'').slice(4).includes(bf))return false}
+    if(currentFilterMode==='PRIORITY')return /紅燈|黃燈/.test(m.status);
+    if(currentFilterMode==='ACTIVE')return /紅燈|黃燈|綠燈/.test(m.status);
+    if(currentFilterMode==='TRACK')return isOverdue(m);
+    return true;
+  });
+
+  if(!list.length){
+    grid.innerHTML=members.length
+      ?`<div class="empty"><b>沒有符合的夥伴</b>換個條件或清空搜尋試試</div>`
+      :`<div class="empty"><b>還沒有夥伴檔案</b>點右下角「新增夥伴」開始建立</div>`;
+  }else grid.innerHTML=list.map(cardHTML).join('');
+  renderReminders();
+}
+
+function profitSummary(m){
+  const p=(m.profits||[]).slice().sort((a,b)=>a.month.localeCompare(b.month));
+  if(!p.length)return '';
+  const last=p[p.length-1],prev=p[p.length-2];
+  let diff='';
+  if(prev&&prev.amount>0){const r=Math.round((last.amount-prev.amount)/prev.amount*100);diff=`<small class="${r>=0?'up':'down'}">${r>=0?'▲':'▼'} ${Math.abs(r)}%</small>`}
+  const mon=parseInt(last.month.split('-')[1])||last.month;
+  return `<div class="profit"><span class="lb">${mon}月淨利</span><span class="v">${money(last.amount)}${diff}</span></div>`;
+}
+
+function avatarHTML(m,cls=''){
+  return `<div class="avatar lv-${m.level} ${cls}">${escapeHtml((m.name||'?').charAt(0))}<span class="dot" style="background:${statusOf(m.status).c}"></span></div>`;
+}
+
+function cardHTML(m){
+  const lc=lastCare(m),days=getDaysDiff(lc),late=isOverdue(m);
+  const d=m.diaries&&m.diaries[0];
+  let snippet='還沒有日記';
+  if(d&&d.entries){const parts=Object.values(d.entries).filter(v=>v&&v.trim());if(parts.length)snippet=parts.join('／')}
+  const sub=[m.city,m.birthday?'🎂'+shortDate(m.birthday):'',m.job].filter(Boolean).map(escapeHtml).join('　');
+  const p=(m.profits||[]).slice().sort((a,b)=>a.month.localeCompare(b.month));
+  let profit='';
+  if(p.length){
+    const last=p[p.length-1],prev=p[p.length-2];let tag=`${parseInt(last.month.split('-')[1])}月淨利`;
+    if(prev&&prev.amount>0){const r=Math.round((last.amount-prev.amount)/prev.amount*100);tag=`<small class="${r>=0?'up':'down'}">${r>=0?'▲':'▼'}${Math.abs(r)}%</small> `+tag}
+    profit=`<div class="c-profit"><b>${money(last.amount)}</b><small>${tag}</small></div>`;
+  }
+  return `<article class="card" id="card-${m.id}">
+    <div class="c-head">${avatarHTML(m)}
+      <div class="c-name"><div class="nm">${escapeHtml(m.name)} <span class="pill lv-${m.level}" style="vertical-align:2px">${m.level}</span></div>
+        <div class="c-sub">${sub||escapeHtml(m.lineName)}</div></div>
+      ${profit}
+    </div>
+    <div class="care-line ${late?'late':''}">
+      <span class="when">${lc?(late?`${days}天沒關心`:`${days}天前`):'未關心'}</span>
+      <span class="sn">${escapeHtml(snippet)}</span>
+      ${late?`<button class="mini-chk" onclick="markCaredToday('${m.id}')">已關心 ✓</button>`:''}
+    </div>
+    <div class="c-foot">
+      <button onclick="openViewModal('${m.id}')">檔案</button>
+      <button onclick="openDiaryModal('${m.id}')">日記 ${m.diaries?m.diaries.length:0}</button>
+      <button onclick="openMindmapModal('${m.id}')">全景圖</button>
+      <button onclick="editMember('${m.id}')">編輯</button>
+    </div>
+  </article>`;
+}
+
+/* ---------- 提醒 ---------- */
+function renderReminders(){
+  const box=document.getElementById('reminderList');
+  const md=todayStr().slice(5);
+  let html='';
+  members.forEach(m=>{
+    if(m.birthday&&m.birthday.slice(5)===md)
+      html+=`<div class="remind-item bday"><div class="txt">🎂 今天是 <b>${escapeHtml(m.name)}</b> 的生日<small>記得傳一句祝福給她</small></div><button class="chk ghost" onclick="scrollToCard('${m.id}')">查看</button></div>`;
+  });
+  members.filter(isOverdue).sort((a,b)=>getDaysDiff(lastCare(b))-getDaysDiff(lastCare(a))).forEach(m=>{
+    const lc=lastCare(m);
+    html+=`<div class="remind-item"><div class="txt"><b>${escapeHtml(m.name)}</b>　${m.status.split(' ')[0]} ${m.level}<small>${lc?`已 ${getDaysDiff(lc)} 天沒關心`:'還沒有關心紀錄'}</small></div>
+      <button class="chk ghost" onclick="scrollToCard('${m.id}')">查看</button><button class="chk" onclick="markCaredToday('${m.id}')">已關心 ✓</button></div>`;
+  });
+  box.innerHTML=html;
+  box.style.display=html?'flex':'none';
+}
+function markCaredToday(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  m.lastCareDate=todayStr();
+  if(saveToStorage()){renderMembers();toast(`已記錄：今天關心了 ${m.name}`)}
+}
+function scrollToCard(id){
+  if(currentFilterMode!=='ALL'&&!document.getElementById('card-'+id))setDashboardFilter('ALL');
+  const el=document.getElementById('card-'+id);if(!el)return;
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+}
+
+/* ---------- Modal ---------- */
+function openModal(id){document.getElementById(id).classList.add('open');document.body.classList.add('lock')}
+function closeModal(id){document.getElementById(id).classList.remove('open');if(!document.querySelector('.modal.open'))document.body.classList.remove('lock')}
+function bgClose(e,id){if(e.target.id===id)closeModal(id)}
+
+/* ---------- 新增／編輯 ---------- */
+function openNewMember(){
+  document.getElementById('memberForm').reset();
+  document.getElementById('memberId').value='';
+  document.getElementById('modalTitle').textContent='新增夥伴';
+  document.getElementById('deleteMemberBtn').style.display='none';
+  document.getElementById('memberJoinDate').value=todayStr();
+  document.getElementById('profitMonth').value=todayStr().slice(0,7);
+  tempPhotos={slim:[],skin:[],s9:[],diary:[]};tempProfitList=[];
+  ['slim','skin','s9'].forEach(renderThumbnails);renderProfitList();
+  openModal('memberModal');
+}
+function onLevelChange(){document.getElementById('memberPromoteDate').value=todayStr()}
+function editMember(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  const set=(k,v)=>document.getElementById(k).value=v||'';
+  document.getElementById('modalTitle').textContent='編輯 '+m.name;
+  document.getElementById('deleteMemberBtn').style.display='';
+  set('memberId',m.id);set('memberName',m.name);set('memberLineName',m.lineName);set('memberBirthday',m.birthday);
+  set('memberCity',m.city);set('memberIg',m.ig);set('memberLevel',m.level);set('memberPromoteDate',m.promoteDate);
+  set('memberStatus',m.status);set('memberJob',m.job);set('memberJoinDate',m.joinDate);set('memberLastCareDate',m.lastCareDate);
+  set('memberInitialFollowers',m.initialFollowers);set('memberTags',(m.tags||[]).join(', '));
+  set('storySlim',m.stories?.slim);set('storySkin',m.stories?.skin);set('storyHealth',m.stories?.health);set('story9S',m.stories?.s9);
+  set('profitMonth',todayStr().slice(0,7));set('profitAmount','');
+  tempPhotos={slim:[...(m.photos?.slim||[])],skin:[...(m.photos?.skin||[])],s9:[...(m.photos?.s9||[])],diary:[]};
+  tempProfitList=[...(m.profits||[])];
+  ['slim','skin','s9'].forEach(renderThumbnails);renderProfitList();
+  openModal('memberModal');
+}
+function saveMember(e){
+  e.preventDefault();
+  const g=k=>document.getElementById(k).value.trim();
+  const id=g('memberId');
+  const data={name:g('memberName'),lineName:g('memberLineName'),birthday:g('memberBirthday'),city:g('memberCity'),ig:g('memberIg'),
+    level:g('memberLevel'),promoteDate:g('memberPromoteDate'),status:document.getElementById('memberStatus').value,job:g('memberJob'),
+    joinDate:g('memberJoinDate'),lastCareDate:g('memberLastCareDate'),initialFollowers:parseInt(g('memberInitialFollowers'))||0,
+    tags:g('memberTags').split(/[,，、]\s*/).map(t=>t.trim()).filter(Boolean),
+    stories:{slim:g('storySlim'),skin:g('storySkin'),health:g('storyHealth'),s9:g('story9S')},
+    photos:{slim:[...tempPhotos.slim],skin:[...tempPhotos.skin],s9:[...tempPhotos.s9]},
+    profits:[...tempProfitList]};
+  if(id){const i=members.findIndex(m=>m.id===id);if(i>-1)members[i]={...members[i],...data}}
+  else members.unshift({id:Date.now().toString(),...data,diaries:[]});
+  if(saveToStorage()){renderMembers();closeModal('memberModal');toast('已儲存 ✨')}
+}
+function deleteMember(){
+  const id=document.getElementById('memberId').value;
+  const m=members.find(x=>x.id===id);if(!m)return;
+  if(!confirm(`確定刪除「${m.name}」的所有資料？刪除後無法復原。`))return;
+  members=members.filter(x=>x.id!==id);
+  saveToStorage();renderMembers();closeModal('memberModal');toast('已刪除');
+}
+
+/* ---------- 淨利 ---------- */
+function addProfitRecord(){
+  const key=document.getElementById('profitMonth').value;
+  const amount=parseFloat(document.getElementById('profitAmount').value);
+  if(isNaN(amount)){toast('請填淨利金額');return}
+  const ex=tempProfitList.find(p=>p.month===key);
+  if(ex)ex.amount=amount;else tempProfitList.push({month:key,amount});
+  tempProfitList.sort((a,b)=>a.month.localeCompare(b.month));
+  document.getElementById('profitAmount').value='';
+  renderProfitList();
+}
+function renderProfitList(){
+  document.getElementById('profitRecordList').innerHTML=tempProfitList.map((p,i)=>
+    `<span class="chip">${p.month.replace('-','年').replace(/年0?/,'年')}月　${money(p.amount)}<button type="button" onclick="removeProfitRecord(${i})">✕</button></span>`).join('');
+}
+function removeProfitRecord(i){tempProfitList.splice(i,1);renderProfitList()}
+
+/* ---------- 照片（自動壓縮，省空間） ---------- */
+function compressImage(file){
+  return new Promise(res=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const max=1080,s=Math.min(1,max/Math.max(img.width,img.height));
+        const c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        res(c.toDataURL('image/jpeg',.72));
+      };
+      img.onerror=()=>res(e.target.result);
+      img.src=e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+async function handlePhotoUpload(e,key){
+  const files=Array.from(e.target.files||[]);
+  for(const f of files){tempPhotos[key].push(await compressImage(f))}
+  e.target.value='';renderThumbnails(key);
+}
+function renderThumbnails(key){
+  const box=document.getElementById('thumb-'+key);if(!box)return;
+  box.innerHTML=tempPhotos[key].map((src,i)=>`<div class="thumb"><img src="${src}" onclick="openImgViewer(this.src)"><button type="button" class="x" onclick="removePhoto('${key}',${i})">✕</button></div>`).join('');
+}
+function removePhoto(key,i){tempPhotos[key].splice(i,1);renderThumbnails(key)}
+function thumbsView(arr){return (arr||[]).length?`<div class="thumbs">${arr.map(s=>`<div class="thumb"><img src="${s}" onclick="openImgViewer(this.src)"></div>`).join('')}</div>`:''}
+function openImgViewer(src){document.getElementById('imgViewerPic').src=src;document.getElementById('imgViewerModal').classList.add('open')}
+
+/* ---------- 檔案預覽 ---------- */
+function storiesBlock(m,withPhotos){
+  const items=[['🏃 瘦身經歷','slim'],['✨ 美肌故事','skin'],['🌿 健康系列','health'],['🏆 9S 見證','s9']];
+  return items.map(([t,k])=>{
+    const txt=m.stories?.[k],ph=withPhotos?thumbsView(m.photos?.[k]):'';
+    return (txt||ph)?`<div class="story"><b>${t}</b>${txt?`<p>${escapeHtml(txt)}</p>`:''}${ph}</div>`:'';
+  }).join('');
+}
+function openViewModal(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  const {age,astro}=calculateAgeInfo(m.birthday);
+  const kv=[['生日',m.birthday?`${m.birthday}（${age}・${astro}）`:''],['居住地',m.city],['職業',m.job],['加入日期',m.joinDate],
+    ['晉升日期',m.promoteDate],['起始粉絲',m.initialFollowers?Number(m.initialFollowers).toLocaleString():''],['上次關心',lastCare(m)]]
+    .filter(x=>x[1]).map(([k,v])=>`<div><small>${k}</small><span>${escapeHtml(String(v))}</span></div>`).join('');
+  const st=storiesBlock(m,true);
+  document.getElementById('viewModalContent').innerHTML=`
+    <div class="pf-top">${avatarHTML(m)}<div><div style="font-size:1.4rem;font-weight:900">${escapeHtml(m.name)} <span class="ln" style="font-size:.9rem;color:var(--ink3);font-weight:500">${escapeHtml(m.lineName)}</span></div>
+      <div class="pills"><span class="pill lv-${m.level}">${m.level}</span><span class="pill st">${escapeHtml(m.status)}</span></div></div></div>
+    ${m.tags?.length?`<div class="tags" style="margin-bottom:14px">${m.tags.map(t=>`<span class="tag">#${escapeHtml(t)}</span>`).join('')}</div>`:''}
+    <div class="kv">${kv}</div>
+    ${m.ig?`<p style="margin-bottom:18px"><a href="${escapeHtml(m.ig)}" target="_blank" rel="noopener" style="color:var(--rose-d);font-weight:700">開啟 IG ↗</a></p>`:''}
+    ${st?`<div class="sec-t">產品見證</div>${st}`:''}`;
+  document.getElementById('viewToEditBtn').onclick=()=>{closeModal('viewModal');editMember(id)};
+  openModal('viewModal');
+}
+
+/* ---------- 日記 ---------- */
+function setDiaryType(v){
+  document.getElementById('diaryType').value=v;
+  document.querySelectorAll('#diaryTypeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+}
+function openDiaryModal(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  document.getElementById('diaryMemberId').value=id;
+  document.getElementById('diaryModalTitle').textContent=`${m.name} 的培訓日記`;
+  resetDiaryForm();renderDiaryList(m);openModal('diaryModal');
+}
+function resetDiaryForm(){
+  document.getElementById('diaryEntryId').value='';
+  document.getElementById('diaryDate').value=todayStr();
+  setDiaryType('🌐 線上');
+  ENTRY_KEYS.forEach(k=>document.getElementById('diary_'+k).value='');
+  tempPhotos.diary=[];renderThumbnails('diary');
+  document.getElementById('cancelDiaryEditBtn').style.display='none';
+  document.getElementById('saveDiaryBtn').textContent='儲存日記';
+}
+function saveDiaryEntry(e){
+  e.preventDefault();
+  const mid=document.getElementById('diaryMemberId').value,eid=document.getElementById('diaryEntryId').value;
+  const entries={};ENTRY_KEYS.forEach(k=>{const v=document.getElementById('diary_'+k).value.trim();if(v)entries[k]=v});
+  if(!Object.keys(entries).length){toast('至少填寫一個項目再儲存');return}
+  const m=members.find(x=>x.id===mid);if(!m)return;
+  if(!m.diaries)m.diaries=[];
+  const data={id:eid||Date.now().toString(),date:document.getElementById('diaryDate').value,type:document.getElementById('diaryType').value,entries,photos:[...tempPhotos.diary]};
+  if(eid){const i=m.diaries.findIndex(d=>d.id===eid);if(i>-1)m.diaries[i]=data}else m.diaries.unshift(data);
+  m.diaries.sort((a,b)=>b.date.localeCompare(a.date));
+  if(!m.lastCareDate||m.diaries[0].date>=m.lastCareDate)m.lastCareDate=m.diaries[0].date;
+  if(saveToStorage()){renderDiaryList(m);renderMembers();resetDiaryForm();toast('日記已儲存 ✨')}
+}
+function renderDiaryList(m){
+  const box=document.getElementById('diaryList');
+  if(!m.diaries||!m.diaries.length){box.innerHTML='<p class="muted">還沒有紀錄，寫下第一篇吧。</p>';return}
+  box.innerHTML=`<div class="tl">${m.diaries.map(d=>`
+    <div class="tl-item"><div class="tl-head"><div><b>${d.date}</b><small>${d.type}</small></div>
+      <div style="display:flex;gap:4px"><button class="btn ghost sm" onclick="editDiaryEntry('${m.id}','${d.id}')">編輯</button><button class="btn danger sm" onclick="deleteDiaryEntry('${m.id}','${d.id}')">刪除</button></div></div>
+      ${Object.keys(d.entries||{}).map(k=>`<div class="tl-entry"><em>${entryLabelMap[k]||k}</em><p>${escapeHtml(d.entries[k])}</p></div>`).join('')}
+      ${thumbsView(d.photos)}
+    </div>`).join('')}</div>`;
+}
+function editDiaryEntry(mid,eid){
+  const m=members.find(x=>x.id===mid);const d=m&&m.diaries.find(x=>x.id===eid);if(!d)return;
+  document.getElementById('diaryEntryId').value=d.id;
+  document.getElementById('diaryDate').value=d.date;
+  setDiaryType(d.type||'🌐 線上');
+  ENTRY_KEYS.forEach(k=>document.getElementById('diary_'+k).value=d.entries?.[k]||'');
+  tempPhotos.diary=[...(d.photos||[])];renderThumbnails('diary');
+  document.getElementById('cancelDiaryEditBtn').style.display='';
+  document.getElementById('saveDiaryBtn').textContent='更新日記';
+  document.querySelector('#diaryModal .sheet-body').scrollTop=0;
+}
+function deleteDiaryEntry(mid,eid){
+  if(!confirm('確定刪除這篇日記？'))return;
+  const m=members.find(x=>x.id===mid);if(!m)return;
+  m.diaries=m.diaries.filter(d=>d.id!==eid);
+  saveToStorage();renderDiaryList(m);renderMembers();toast('已刪除');
+}
+
+/* ---------- 全景圖 ---------- */
+function openMindmapModal(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  document.getElementById('mindmapTitle').textContent=`${m.name} 全景圖`;
+  const buckets={};ENTRY_KEYS.forEach(k=>buckets[k]=[]);
+  (m.diaries||[]).forEach(d=>Object.keys(d.entries||{}).forEach(k=>buckets[k]&&buckets[k].push({date:d.date,c:d.entries[k]})));
+  const bucket=k=>buckets[k].length?`<div style="margin-bottom:12px"><div style="font-weight:700;font-size:.9rem;margin-bottom:6px">${entryLabelMap[k]} <span class="muted">${buckets[k].length} 筆</span></div>
+    ${buckets[k].map(i=>`<div class="tl-entry"><em>${i.date}</em><p>${escapeHtml(i.c)}</p></div>`).join('')}</div>`:'';
+  const retail=['retail_drain','retail_story','retail_sale','retail_after'].map(bucket).join('');
+  const team=['team_recruit','team_manage'].map(bucket).join('');
+  const p=(m.profits||[]).slice().sort((a,b)=>a.month.localeCompare(b.month)).slice(-6);
+  const max=Math.max(1,...p.map(x=>x.amount));
+  const bars=p.length?`<div class="bars">${p.map(x=>`<div class="bar"><i style="height:${Math.max(4,x.amount/max*85)}%"><span>${x.amount>=10000?(x.amount/10000).toFixed(1).replace('.0','')+'萬':x.amount}</span></i><small>${parseInt(x.month.split('-')[1])}月</small></div>`).join('')}</div>`:'<p class="muted">還沒有淨利紀錄</p>';
+  const st=storiesBlock(m,false);
+  document.getElementById('mindmapContent').innerHTML=`
+    <div class="pf-top">${avatarHTML(m)}<div><div class="pills"><span class="pill lv-${m.level}">${m.level}</span><span class="pill st">${escapeHtml(m.status)}</span></div>
+      <p class="muted" style="margin-top:4px">${m.promoteDate?`晉升於 ${m.promoteDate}`:''}${m.initialFollowers?`　起始 ${Number(m.initialFollowers).toLocaleString()} 粉`:''}</p></div></div>
+    <div class="block"><h3>💰 近 6 個月淨利</h3>${bars}</div>
+    ${st?`<div class="block"><h3>🌸 產品見證</h3>${st}</div>`:''}
+    <div class="block"><h3>🔄 零售四大循環</h3>${retail||'<p class="muted">尚無紀錄</p>'}</div>
+    <div class="block"><h3>🚀 招商與團隊</h3>${team||'<p class="muted">尚無紀錄</p>'}</div>`;
+  openModal('mindmapModal');
+}
+
+/* ---------- 通知／備份 ---------- */
+function requestNotificationPermission(){
+  if(!('Notification' in window)){toast('這個瀏覽器不支援通知（iPhone 需先「加入主畫面」）');return}
+  Notification.requestPermission().then(p=>toast(p==='granted'?'已開啟通知 🔔':'通知未開啟'));
+}
+function exportData(){
+  document.getElementById('menu').classList.remove('open');
+  const blob=new Blob([JSON.stringify(members,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`DCT夥伴備份_${todayStr()}.json`;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+  toast('備份已匯出');
+}
+function triggerImport(){document.getElementById('menu').classList.remove('open');document.getElementById('importFile').click()}
+function importData(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{const d=JSON.parse(ev.target.result);
+      if(!Array.isArray(d))throw 0;
+      if(!confirm(`匯入 ${d.length} 位夥伴，會覆蓋目前資料，確定嗎？`))return;
+      members=d;saveToStorage();renderMembers();toast('匯入成功 📥');
+    }catch(err){toast('匯入失敗，請確認是這個系統匯出的備份檔')}
+    e.target.value='';
+  };
+  r.readAsText(f);
+}
+
+renderMembers();
+</script>
+</body>
+</html>
